@@ -1,22 +1,17 @@
 import os
 import glob
 import argparse
-import sys
 import math
 import cv2
 import pandas as pd
 
-from json_data import load_json
-
-sys.path.insert(0, '../prepare_data/ark_creation')
-from mediapipe_feature_data import mediapipe_feature_data
-from interpolate_feature_data import interpolate_feature_data
-from kalman_feature_data import kalman_feature_data
+from model_feature_data_extraction.mediapipe_feature_data import mediapipe_feature_data
+from model_feature_data_extraction.interpolate_feature_data import interpolate_feature_data
+from model_feature_data_extraction.custom_feature_data import custom_feature_data
 
 def make_mediapipe_video(frames_directory, features_filepath, save_directory, features, table_video, table_filepath, visualization_types, frame_rate):
 
-
-    """Generates visualization video(s) for a specific recording (trial) for the following types of dataframes: mediapipe, interpolate, and kalman.
+    """Generates visualization video(s) for a specific recording (trial) for the following types of dataframes: mediapipe, interpolate, and custom.
 
     Parameters
     ----------
@@ -37,8 +32,8 @@ def make_mediapipe_video(frames_directory, features_filepath, save_directory, fe
 
     visualization_types : 2D list of str
         Each element is a list of strings that describes the type of dataframes to include in the specific video. Each element will generate a seperate video
-        options: 'mediapipe', 'interpolate', 'kalman'
-        -- ex. [['mediapipe'], ['interpolate'], ['kalman'], ['mediapipe', 'interpolate', 'kalman']]
+        options: 'mediapipe', 'interpolate', 'custom'
+        -- ex. [['mediapipe'], ['interpolate'], ['custom'], ['mediapipe', 'interpolate', 'custom']]
             Will generate four videos for the specific trial where the first three will be seperate videos with each one type of dataframe, and the last one will be an aggregate of all 3 dataframes
 
     frame_rate : int
@@ -49,14 +44,14 @@ def make_mediapipe_video(frames_directory, features_filepath, save_directory, fe
     Generates visualization video(s) for a specific input video 
 
     """
-    print("Making Visualization Video for {}".format(save_directory))
+    print(f"Making Visualization Video for {save_directory}")
 
     mediapipe_feature_df = mediapipe_feature_data(features_filepath, features, drop_na = False)
     interpolate_feature_df = interpolate_feature_data(features_filepath, features, center_on_face = False, scale = 1, drop_na = False)
-    kalman_feature_df = kalman_feature_data(features_filepath, features, drop_na = False)
+    custom_feature_df = custom_feature_data(features_filepath, features, drop_na = False)
     
     # A dictionary with the three different types of feature data DataFrame 
-    feature_df_dict = {'mediapipe': mediapipe_feature_df, 'interpolate': interpolate_feature_df, 'kalman': kalman_feature_df}
+    feature_df_dict = {'mediapipe': mediapipe_feature_df, 'interpolate': interpolate_feature_df, 'custom': custom_feature_df}
 
     # A dictionary that has its key as the root word of each type of feature: {left_hand: [left_hand_x, left_hand_y, left_hand_w, left_hand_h], right_hand: [right_hand_x, ...] ...}
     features_to_extract_dict = {}
@@ -142,13 +137,13 @@ def draw_features(visualization_type, frames_filepaths, features_to_extract_dict
                     color = (255, 0, 0) # blue
                     if 'interpolate' in df_type:
                         color = (0, 255, 0) # green
-                    if 'kalman' in df_type:
+                    if 'custom' in df_type:
                         color = (0, 255, 255) # yellow
                 if 'left' in feature_key:
                     color = (0, 0, 255) # red
                     if 'interpolate' in df_type:
                         color = (153, 0, 153) # purple
-                    if 'kalman' in df_type:
+                    if 'custom' in df_type:
                         color = (0, 128, 255) # orange
                 elif 'face' in feature_key:
                     color = (255, 255, 0) # light blue
@@ -175,19 +170,53 @@ def draw_features(visualization_type, frames_filepaths, features_to_extract_dict
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--image_dir', default = '/home/thad/Desktop/AndroidCaptureApp/DATA/Prerna_04_07_20/alligator_in_box/1582398952685')
-    parser.add_argument('--features_filepath', default = '/home/thad/Desktop/AndroidCaptureApp/mp_feats_20-03-25_prerna/alligator_in_box/1582398952685/Prerna.alligator_in_box.1582398952685.data')
-    parser.add_argument('--save_dir', default = '/home/thad/copycat/copycat-ml/main/projects/prerna_20-03-25/visualization/test_alligator_in_box/1582398952685')
-    parser.add_argument('--features', default = []) ##change this
-    parser.add_argument('--shared_directory', default = 'test_alligator_in_box/1582398952685')
+    parser.add_argument('--frames_directory', type = str)
+    parser.add_argument('--features_filepath', type = str)
+    parser.add_argument('--save_directory', type = str)
+    parser.add_argument('--features', type = list, default = [])
     parser.add_argument('--table_video', action = 'store_true')
-    parser.add_argument('--video_type_lists', default = [['mediapipe'], ['interpolate'], ['kalman'], ['mediapipe', 'interpolate', 'kalman']])
-    parser.add_argument('--frame_rate', default = 5)
+    parser.add_argument('--table_filepath', type = str)
+    parser.add_argument('--visualization_types', default = [['mediapipe'], ['interpolate'], ['custom'], ['mediapipe', 'interpolate', 'custom']])
+    parser.add_argument('--frame_rate', type = int, default = 5)
     args = parser.parse_args()
 
-    if not os.path.exists(args.save_dir):
-        os.makedirs(args.save_dir)
-        print("Making Directory ", args.save_dir)
+    """Generates visualization video(s) for a specific recording (trial) for the following types of dataframes: mediapipe, interpolate, and custom.
 
-    make_mediapipe_video(args.image_dir, args.features_filepath, args.save_dir, args.features, args.shared_directory, args.table_video, args.video_type_lists, args.frame_rate)
+    Parameters
+    ----------
+    frames_directory : str
+        Directory path of raw images for the specific trial that were recorded from a capture device
+
+    features_filepath : str
+        File path to raw mediapipe data for the specific trial
+
+    save_directory : str
+        Directory path where the video(s) will be saved 
+
+    features : list of str
+       The names of the features to display in the visualization video(s)
+
+    table_video : bool
+        Whether or not to output video(s) for the specific trial with a table of feature information on the right-hand side
+
+    visualization_types : 2D list of str
+        Each element is a list of strings that describes the type of dataframes to include in the specific video. Each element will generate a seperate video
+        options: 'mediapipe', 'interpolate', 'custom'
+        -- ex. [['mediapipe'], ['interpolate'], ['custom'], ['mediapipe', 'interpolate', 'custom']]
+            Will generate four videos for the specific trial where the first three will be seperate videos with each one type of dataframe, and the last one will be an aggregate of all 3 dataframes
+
+    frame_rate : int
+        The frame rate of the video(s) generated
+
+    Returns
+    -------
+    Generates visualization video(s) for a specific input video 
+
+    """
+
+    if not os.path.exists(args.save_directory):
+        os.makedirs(args.save_directory)
+        print("Making Directory ", args.save_directory)
+
+    make_mediapipe_video(args.frames_directory, args.features_filepath, args.save_directory, args.features, args.table_video, args.table_filepath, args.visualization_types, args.frame_rate)
 

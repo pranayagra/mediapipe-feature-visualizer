@@ -5,23 +5,43 @@ import matplotlib.pyplot as plt
 import sys
 import json
 import argparse
-import shutil
 
 def make_features_table(input_mediapipe_directory: str, users: list, output_visualization_directory: str, mode: str):
 
-    # input_mediapipe_directory: the mediapipe data set directory
+    """Generates .png file(s) that each contain a table which displays the frequency of data from raw MediaPipe data. 
+       Generates a <mode>_score.json that contains the table information concisely in text format. 
 
-    # output_visualization_directory: the location where the tables are saved (actual directory will be <save_dir>/tables/<mode>)
+    Parameters
+    ----------
 
-    # mode options: [trials, phrases, words, all].
-    #  - trials: creates a table for each unique trial
-    #  - phrases: creates a table for each unique phrase
-    #  - words: creates a table for each unique word. Note that this option in reality combines the data from each trial that contains "word"
-    #  - all: creates a table for the entire dataset
+    input_mediapipe_directory : str
+        Directory path to raw mediapipe data
 
-    # Return images of tables in the save_dir location  
+    users : list of str
+        The user(s) to generate tables on. 
+    
+    save_directory : str
+        Directory path where the video(s) will be saved 
 
-    # make output path
+    output_visualization_directory : str
+        Directory path where the tables are saved (actual directory path will be <output_visualization_directory>/tables/<mode>)
+
+    table_video : bool
+        Whether or not to output video(s) for the specific trial with a table of feature information on the right-hand side
+
+    mode : str
+        Mode has the following options: [trials, phrases, words, all]
+        - trials: creates a table for each unique trial
+        - phrases: creates a table for each unique phrase
+        - words: creates a table for each unique word. Note that this option in reality combines the data from each trial that contain the same "word"
+        - all: creates a table for the entire dataset
+
+
+    Returns
+    -------
+    N/A. Generates images of tables and .json file in the specified location  
+
+    """
 
     if not (mode == 'trials' or mode == 'phrases' or mode == 'words' or mode == 'all'):
         return
@@ -45,7 +65,7 @@ def make_features_table(input_mediapipe_directory: str, users: list, output_visu
 
         for features_filepath in features_filepaths:
             
-            print("Creating table for {}".format(features_filepath))
+            print(f"Creating table for {features_filepath}")
 
             # get frequnecy of data for current data file 
             result_table = make_table(features_filepath)
@@ -58,7 +78,7 @@ def make_features_table(input_mediapipe_directory: str, users: list, output_visu
             # make plot for table
             feature_filename = features_filepath.split('/')[-1]
             session, phrase, trial = feature_filename.split('.')[0:3]
-            table_filename = '{}.{}.{}.png'.format(session, phrase, trial)
+            table_filename = f'{session}.{phrase}.{trial}.png'
             table_directory = os.path.join(base_tables_directory, session, phrase, trial)
             make_plot(result_table, table_filename = table_filename, table_directory = table_directory)
 
@@ -92,7 +112,7 @@ def make_features_table(input_mediapipe_directory: str, users: list, output_visu
             result_table = np.round(result_table, 4)
 
             # make plot for table
-            table_filename = '{}.{}.png'.format(session, phrase)
+            table_filename = f'{session}.{phrase}.png'
             table_directory = os.path.join(base_tables_directory, session, phrase)
             make_plot(result_table, table_filename = table_filename, table_directory = table_directory)
 
@@ -127,7 +147,7 @@ def make_features_table(input_mediapipe_directory: str, users: list, output_visu
             result_table = np.round(result_table, 4)
 
             # make plot for table
-            table_filename = '{}.{}.png'.format(session, word)
+            table_filename = f'{session}.{word}.png'
             table_directory = os.path.join(base_tables_directory, session, word)
             make_plot(result_table, table_filename = table_filename, table_directory = table_directory)
 
@@ -152,7 +172,7 @@ def make_features_table(input_mediapipe_directory: str, users: list, output_visu
         session, phrase, trial = feature_filename.split('.')[0:3]
 
         # make string table
-        table_filename = '{}.png'.format(session)
+        table_filename = f'{session}.png'
         table_directory = os.path.join(base_tables_directory, session)
         make_plot(result_table, table_filename = table_filename, table_directory = table_directory)
 
@@ -170,7 +190,7 @@ def make_features_table(input_mediapipe_directory: str, users: list, output_visu
     # print(boxes_score_dict)
 
     # write the boxes score to a file in the respective tables directory
-    score_filepath = os.path.join(base_tables_directory, session, '{}_score.json'.format(mode))
+    score_filepath = os.path.join(base_tables_directory, session, f'{mode}_score.json')
     with open(score_filepath, "w") as file:
         file.write(json.dumps(boxes_score_dict, indent=4)) 
 
@@ -245,7 +265,7 @@ def make_plot(table, table_filename, table_directory):
         
     save_dir = os.path.join(table_directory, table_filename)
 
-    plt.savefig('{}'.format(save_dir)) 
+    plt.savefig(f'{save_dir}') 
 
 
 if __name__ == '__main__':
