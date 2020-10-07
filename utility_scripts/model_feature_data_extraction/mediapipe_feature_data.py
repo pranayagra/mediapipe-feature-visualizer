@@ -1,6 +1,6 @@
 import argparse
 
-from feature_selection import select_features
+from utility_scripts.model_feature_data_extraction.feature_selection import select_features
 
 def mediapipe_feature_data(features_filepath, features, drop_na: bool = True):
 

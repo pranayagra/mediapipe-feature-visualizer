@@ -5,9 +5,9 @@ import math
 import cv2
 import pandas as pd
 
-from model_feature_data_extraction.mediapipe_feature_data import mediapipe_feature_data
-from model_feature_data_extraction.interpolate_feature_data import interpolate_feature_data
-from model_feature_data_extraction.custom_feature_data import custom_feature_data
+from utility_scripts.model_feature_data_extraction.mediapipe_feature_data import mediapipe_feature_data
+from utility_scripts.model_feature_data_extraction.interpolate_feature_data import interpolate_feature_data
+from utility_scripts.model_feature_data_extraction.custom_feature_data import custom_feature_data
 
 def make_mediapipe_video(frames_directory, features_filepath, save_directory, features, table_video, table_filepath, visualization_types, frame_rate):
 
