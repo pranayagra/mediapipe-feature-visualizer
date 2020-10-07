@@ -68,7 +68,7 @@ def make_mediapipe_video(frames_directory, features_filepath, save_directory, fe
 
     for visualization_type in visualization_types:
         draw_features(visualization_type, frames_filepaths, features_to_extract_dict, feature_df_dict, save_directory, table_video, table_filepath)
-        save_video(visualization_type, save_directory, table_filepath.split('/')[-1], frame_rate)
+        save_video(visualization_type, save_directory, os.path.split(table_filepath)[1], frame_rate)
         delete_images(len(frames_filepaths))
 
 

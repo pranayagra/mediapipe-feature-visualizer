@@ -76,12 +76,10 @@ def make_features_table(input_mediapipe_directory: str, users: list, output_visu
             result_table = np.round(result_table, 4)
 
             # make plot for table
-            feature_filename = features_filepath.split('/')[-1]
+            feature_filename = os.path.split(features_filepath)[1]
             session, phrase, trial = feature_filename.split('.')[0:3]
             table_filename = f'{session}.{phrase}.{trial}.png'
             table_directory = os.path.join(base_tables_directory, session, phrase, trial)
-            print(result_table)
-            print(table_filename, table_directory)
             make_plot(result_table, table_filename = table_filename, table_directory = table_directory)
 
             # score among trials between [0, 1]

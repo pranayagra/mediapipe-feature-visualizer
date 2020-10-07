@@ -64,7 +64,7 @@ def make_visualization_videos(input_frames_directory, input_mediapipe_directory,
 
 	 
 	for features_filepath in features_filepaths:
-		filename = features_filepath.split('/')[-1]
+		filename = os.path.split(features_filepath)[1]
 		session, phrase, trial, _ = filename.split('.')
 		
 		frames_directory = os.path.join(input_frames_directory, session, phrase, trial, '*.png')
