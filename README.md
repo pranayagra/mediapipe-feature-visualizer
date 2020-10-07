@@ -1,5 +1,7 @@
 Created by: Pranay Agrawal 
 
+Contact me: pranay.agra@gmail.com
+
 LinkedIn: https://www.linkedin.com/in/pranay--agrawal/
 
 # mediapipe-feature-visualizer
