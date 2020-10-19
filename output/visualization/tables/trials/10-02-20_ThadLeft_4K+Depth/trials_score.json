@@ -1,0 +1,44 @@
+{
+    "boxes": [
+        [
+            "10-02-20_ThadLeft_4K+Depth.alligator_above_black_wall.0000000000.png",
+            0.9224
+        ],
+        [
+            "10-02-20_ThadLeft_4K+Depth.alligator_above_bed.0000000000.png",
+            0.912
+        ],
+        [
+            "10-02-20_ThadLeft_4K+Depth.alligator_above_black_wall.0000000001.png",
+            0.8613
+        ]
+    ],
+    "landmarks": [
+        [
+            "10-02-20_ThadLeft_4K+Depth.alligator_above_black_wall.0000000000.png",
+            0.9052
+        ],
+        [
+            "10-02-20_ThadLeft_4K+Depth.alligator_above_bed.0000000000.png",
+            0.8662
+        ],
+        [
+            "10-02-20_ThadLeft_4K+Depth.alligator_above_black_wall.0000000001.png",
+            0.8468
+        ]
+    ],
+    "faces": [
+        [
+            "10-02-20_ThadLeft_4K+Depth.alligator_above_bed.0000000000.png",
+            0.9014
+        ],
+        [
+            "10-02-20_ThadLeft_4K+Depth.alligator_above_black_wall.0000000001.png",
+            0.6994
+        ],
+        [
+            "10-02-20_ThadLeft_4K+Depth.alligator_above_black_wall.0000000000.png",
+            0.3563
+        ]
+    ]
+}

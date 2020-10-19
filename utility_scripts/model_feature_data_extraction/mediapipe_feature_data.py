@@ -27,7 +27,7 @@ def mediapipe_feature_data(features_filepath, features, drop_na: bool = True):
     features_no_interpolate_df = select_features(features_filepath, features,
                                   center_on_face=False, scale=1, drop_na = drop_na, do_interpolate = False)
 
-    print(f"Select Features (Interpolation: False) DataFrame: ")
+    print(f"Select Features MediaPipe (Interpolation: False) DataFrame: ")
     print(features_no_interpolate_df)
     
     return features_no_interpolate_df

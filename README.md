@@ -12,7 +12,7 @@ A utility tool to visualize features such as bounding boxes and landmarks in ord
 
 Populate `input/DATA/Mediapipe` with MediaPipe `.data` files. The filename must follow the following convention: `<session>.<phrase>.<trial>.data`.
 
-Populate `input/DATA/Frames/<session>/<phrase>/<trial>` with frames of the raw video that correspond to the Mediapipe data file `<session>.<phrase>.<trial>.data`. The frames in sequential order must follow the following filename convention: `frame_{i:03d}.png` where `{i:03d}` is the 3-digit number starting from `000`. For example, the first few frames will be named `frame_000.png, frame_001.png, frame_002.png, ...`.
+Populate `input/DATA/Frames/<session>/<phrase>/<trial>` with frames of the raw video that correspond to the MediaPipe data file `<session>.<phrase>.<trial>.data`. The frames in sequential order must follow the following filename convention: `frame_{i:04d}.png` where `{i:04d}` is the 4-digit number starting from `0000`. For example, the first few frames will be named `frame_0000.png, frame_0001.png, frame_0002.png, ...`.
 
 ## Running the Pipeline
 
@@ -24,7 +24,7 @@ This will create visualization videos and frequency tables in the `output/visual
 
 * `make_visualization_videos.py` `users`: Specify a list of users (keywords) to run the visualization on a refined list of `.data` files.  
 * `make_visualization_videos.py` `table_video`: Flag to specify whether or not to generate table images and append onto the visualization video.
-* `make_visualization_videos.py` `table_video`: The frame rate of the visualization video.
+* `make_visualization_videos.py` `frame_rate`: The frame rate of the visualization video.
 * `make_visualization_videos.py` `visualization_types`: The models to use in the visualization video(s).  
 * `make_visualization_videos.py` `other arguments`: Other arguments are unlikely to change if the setup above is followed. 
 * `input/configs/features.json`: The features to display on the visualization.

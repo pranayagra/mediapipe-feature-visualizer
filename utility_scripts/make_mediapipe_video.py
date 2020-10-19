@@ -69,7 +69,9 @@ def make_mediapipe_video(frames_directory, features_filepath, save_directory, fe
     for visualization_type in visualization_types:
         draw_features(visualization_type, frames_filepaths, features_to_extract_dict, feature_df_dict, save_directory, table_video, table_filepath)
         save_video(visualization_type, save_directory, os.path.split(table_filepath)[1], frame_rate)
-        delete_images(len(frames_filepaths))
+        delete_images(save_directory, len(frames_filepaths))
+
+    print(f"Finished Visualization Video for {save_directory}")
 
 
 def calculate_coordinates(data, height, width, feature_type):
@@ -102,27 +104,27 @@ def calculate_coordinates(data, height, width, feature_type):
             y = int(y * height)
         return (x, y)
 
-def delete_images(num_frames):
+def delete_images(save_directory, num_frames):
+    file_location = os.path.join(save_directory, 'frame')
     for i in range(num_frames):
-        filename = f'frame_{i:03d}.png'
+        filename = f'{file_location}_{i:04d}.png'
         os.remove(filename)
 
 def save_video(visualization_type, save_directory, table_filename, frame_rate = 5):
-    os.chdir(save_directory)
 
     visual_types = '_'.join(visualization_type)
     session, phrase, trial = table_filename.split('.')[0:3]
 
     video_filename = '.'.join((session, phrase, trial, visual_types, 'mp4'))
 
-    os.system('ffmpeg -r {} -f image2 -s 1024x768 -i frame_%03d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p {}'.format(frame_rate, video_filename))
+    os.system('ffmpeg -r {} -f image2 -s 1024x768 -i {}_%04d.png -vcodec libx264 -loglevel quiet -crf 25  -pix_fmt yuv420p {}'.format(frame_rate, os.path.join(save_directory, 'frame'), os.path.join(save_directory, video_filename)))
 
 def draw_features(visualization_type, frames_filepaths, features_to_extract_dict, feature_df_dict, save_directory, table_video, table_filepath):
 
     height, width, _ = cv2.imread(frames_filepaths[0]).shape
 
     for i, frame_filepath in enumerate(frames_filepaths):
-        filename = f'frame_{i:03d}.png'
+        filename = f'frame_{i:04d}.png'
         image = cv2.imread(frame_filepath)
         height, width, _ = image.shape
 
@@ -153,12 +155,12 @@ def draw_features(visualization_type, frames_filepaths, features_to_extract_dict
                 if 'hand' in feature_key:          
                     x, y, w, h = calculate_coordinates(feature_df_dict[str(df_type)].loc[i, feature_key_to_extract].values, height, width, 'hand')
                     if x and y and w and h:
-                        cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
+                        cv2.rectangle(image, (x, y), (x + w, y + h), color, 8)
                 elif 'landmark' in feature_key or 'face' in feature_key:
                     label = 'landmark' if 'landmark' in feature_key else 'face'
                     x, y = calculate_coordinates(feature_df_dict[str(df_type)].loc[i, feature_key_to_extract].values, height, width, label)
                     if x and y:
-                        cv2.circle(image, (x, y), 3, color, -1)
+                        cv2.circle(image, (x, y), 10, color, -1)
 
         if table_video:
             table_image = cv2.imread(table_filepath)
